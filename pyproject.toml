@@ -1,0 +1,43 @@
+[project]
+name = "racetrack_job_wrapper"
+version = "1.16.0"
+description = "Racetrack Job Runner"
+license = {text = "Apache License 2.0"}
+authors = [
+    { name = "ERST", email = "noreply@erst.dk" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: Apache Software License",
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/TheRacetrack/job-runner-python-lib"
+
+
+[build-system]
+requires = ["setuptools", "build", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]  # list of folders that contain the packages (["."] by default)
+include = [  # package names should match these glob patterns (["*"] by default)
+    "racetrack_client*",
+    "racetrack_commons*",
+    "racetrack_job_wrapper*",
+]
+exclude = []
+namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
+[project.scripts]
+racetrack_job_wrapper = "racetrack_job_wrapper.main:main"

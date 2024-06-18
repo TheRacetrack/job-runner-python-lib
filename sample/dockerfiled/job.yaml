@@ -1,0 +1,7 @@
+name: sample-dockerfiled
+owner_email: sample@example.com
+jobtype: dockerfile:latest
+version: 0.0.1
+git:
+  remote: https://github.com/TheRacetrack/job-runner-python-lib.git
+  directory: sample/dockerfiled

@@ -1,0 +1,13 @@
+# IDE
+.idea
+*.iml
+.vscode
+# Python
+__pycache__
+*.pyc
+*.egg-info
+.pytest_cache
+.coverage
+.mypy_cache
+/venv
+/rt-venv

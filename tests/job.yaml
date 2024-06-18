@@ -1,0 +1,9 @@
+name: adder
+owner_email: sample@example.com
+jobtype: python3:latest
+git:
+  remote: https://github.com/TheRacetrack/plugin-python-job-type
+  directory: sample/python-class
+jobtype_extra:
+  entrypoint_path: 'entrypoint.py'
+  entrypoint_class: 'AdderModel'

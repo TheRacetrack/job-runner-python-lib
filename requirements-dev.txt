@@ -1,0 +1,12 @@
+# Testing/sample tools
+pytest==7.2.1
+coverage==7.2.1
+backoff==2.2.1
+numpy==1.26.4
+Flask==2.2.5
+# Release tools
+setuptools==70.0.0
+setuptools_scm==8.1.0
+build==1.2.1
+wheel==0.43.0
+twine==5.1.0
