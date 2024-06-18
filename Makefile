@@ -21,7 +21,7 @@ build-docker:
 	racetrack_job_wrapper template Dockerfile Dockerfile.templated &&\
 	docker buildx build -t sample-primer-job:latest -f Dockerfile.templated .
 
-run-docker:
+run-docker: build-docker
 	docker run --rm -it --name sample-primer-job -p 7000:7000 sample-primer-job:latest
 
 run-racetrack:

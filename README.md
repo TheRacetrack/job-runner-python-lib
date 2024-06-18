@@ -86,7 +86,7 @@ python main.py
 
 ### 2. Run in Docker
 ```shell
-make build-docker run-docker
+make run-docker
 ```
 
 ### 3. Run on Racetrack
