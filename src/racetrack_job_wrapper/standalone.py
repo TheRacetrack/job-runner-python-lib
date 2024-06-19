@@ -16,7 +16,12 @@ logger = get_logger(__name__)
 
 
 def serve_job_class(entrypoint_class: Type[JobEntrypoint]):
-    """Instantiate job entrypoint class and serve it with an API server"""
+    """
+    Instantiate job entrypoint class and serve it with an API server.
+    While loading the job (creating its instance), it responds to liveness and readiness probes.
+    This function blocks further execution,
+    handling requests at http://0.0.0.0:7000.
+    """
     configure_logs(log_level='debug')
 
     health_state = HealthState()
@@ -34,7 +39,17 @@ def serve_job_class(entrypoint_class: Type[JobEntrypoint]):
 
 
 def serve_job_instance(entrypoint: JobEntrypoint):
-    """Serve a job entrypoint instance with an API server"""
+    """
+    Serve a job entrypoint instance with an API server.
+    This function blocks further execution,
+    handling requests at http://0.0.0.0:7000.
+
+    Usually, you just need:
+        job = Job()
+        serve_job_instance(job)
+
+    but if your job initialization takes some time, use `serve_job_class` instead.
+    """
     health_state = HealthState(live=True, ready=True)
     manifest_dict = read_job_manifest()
     app = create_api_app(entrypoint, health_state, manifest_dict)

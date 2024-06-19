@@ -15,7 +15,7 @@ Check out [Changelog](./docs/CHANGELOG.md) to find out about notable changes.
 ## Installation
 You can locally install this Job runner to your local environment by doing:
 ```sh
-pip install "git+https://github.com/TheRacetrack/job-runner-python-lib.git@master#subdirectory=."
+pip install "git+https://github.com/TheRacetrack/job-runner-python-lib.git@master"
 ```
 
 This will install `racetrack_job_wrapper` package that can be imported later on.
@@ -43,7 +43,8 @@ class Job:
         return {'number': 7907}
 ```
 
-You can run it inside an API server (and provide a lot of extra features) by calling `racetrack_job_wrapper.standalone.serve_job_class` function in your Python program,
+You can run it inside an API server (and provide a lot of extra features)
+by calling `racetrack_job_wrapper.standalone.serve_job_class` function in your Python program,
 combined with your `Job` class:  
 #### **`main.py`**
 ```python
@@ -70,6 +71,7 @@ This single line `serve_job_class(Job)` does a lot of things, including:
 - Map Job's methods to auxiliary endpoints
 - Serve static resources
 - Serve Custom Webview UI (if defined in a Job's entrypoint)
+- Serve empty API server, responding to liveness and readiness probes, while loading the Job
 - Concurrent requests cap
 - Make chain calls to other jobs
 - Structured logging
@@ -95,8 +97,11 @@ racetrack deploy sample/dockerfiled
 ```
 
 ## Comparison with Python job type
-This library has been originated from [Python job type plugin](https://github.com/TheRacetrack/plugin-python-job-type).
-If you need to recreate some of its features, take a look at the [job Dockerfile template](https://github.com/TheRacetrack/plugin-python-job-type/blob/master/src/job-template.Dockerfile) and do the same in your individual Job's Dockerfile.
+This library has been originated from
+[Python job type plugin](https://github.com/TheRacetrack/plugin-python-job-type).
+If you need to recreate some of its features, take a look at the
+[job Dockerfile template](https://github.com/TheRacetrack/plugin-python-job-type/blob/master/src/job-template.Dockerfile)
+and do the same in your individual Job's Dockerfile.
 
 In contrast to Python job type plugin, you directly call the utility functions in your code, you bind the things together.
 This is opposed to a job type, where the framework calls your code.
