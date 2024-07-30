@@ -27,6 +27,7 @@ def test_parse_nested_dataclasses():
         git: _GitManifest
         resources: Optional[_ResourcesManifest] = None
         labels: list[str] = field(default_factory=list)
+        origin_yaml_: Optional[str] = field(default=None, metadata={'exclude': True})
 
     datamodel = _Manifest(
         name='adder',

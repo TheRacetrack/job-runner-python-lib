@@ -3,8 +3,6 @@ from pathlib import Path
 from typing import Dict, Optional
 from dataclasses import dataclass, field
 
-from pydantic import BaseModel
-
 from racetrack_client.log.context_error import wrap_context
 from racetrack_client.manifest import Manifest
 from racetrack_client.utils.datamodel import parse_dict_datamodel

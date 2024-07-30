@@ -1,13 +1,11 @@
+from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 
-from pydantic import BaseModel, ConfigDict, Field
-
-from racetrack_client.utils.quantity import AnnotatedQuantity
+from racetrack_client.utils.quantity import Quantity
 
 
-class GitManifest(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-
+@dataclass
+class GitManifest:
     # URL of git remote: HTTPS, SSH or directory path to a remote repository
     remote: str
     branch: Optional[str] = None
@@ -15,22 +13,21 @@ class GitManifest(BaseModel):
     directory: str = '.'
 
 
-class ResourcesManifest(BaseModel):
-    model_config = ConfigDict(extra='forbid', arbitrary_types_allowed=True)
+@dataclass
+class ResourcesManifest:
+    # minimum memory amount in bytes, e.g. 256Mi
+    memory_min: Optional[Quantity] = None
+    # maximum memory amount in bytes, e.g. 1Gi
+    memory_max: Optional[Quantity] = None
+    # minimum CPU consumption in cores, e.g. 10m
+    cpu_min: Optional[Quantity] = None
+    # maximum CPU consumption in cores, e.g. 1000m
+    cpu_max: Optional[Quantity] = None
 
-    # minimum memory amount in bytes, eg. 256Mi
-    memory_min: Optional[AnnotatedQuantity] = None
-    # maximum memory amount in bytes, eg. 1Gi
-    memory_max: Optional[AnnotatedQuantity] = None
-    # minimum CPU consumption in cores, eg. 10m
-    cpu_min: Optional[AnnotatedQuantity] = None
-    # maximum CPU consumption in cores, eg. 1000m
-    cpu_max: Optional[AnnotatedQuantity] = None
 
-
-class Manifest(BaseModel):
+@dataclass
+class Manifest:
     """Job Manifest file - build recipe to get deployable image from source code workspace"""
-    model_config = ConfigDict(extra='forbid', arbitrary_types_allowed=True, populate_by_name=True)
 
     # name of the Job Workload
     name: str
@@ -88,14 +85,14 @@ class Manifest(BaseModel):
     infrastructure_target: Optional[str] = None
 
     # original YAML string from which the manifest was parsed, field for internal use only
-    origin_yaml_: Optional[str] = Field(None, exclude=True)
+    origin_yaml_: Optional[str] = field(default=None, metadata={'exclude': True})
     # original dictionary from which the manifest was parsed, field for internal use only
-    origin_dict_: Optional[Dict[str, Any]] = Field(None, exclude=True)
+    origin_dict_: Optional[Dict[str, Any]] = field(default=None, metadata={'exclude': True})
 
     def get_jobtype(self):
         return self.jobtype if self.jobtype else self.lang
 
     def get_jobtype_extra(self):
-        for field in [self.jobtype_extra, self.golang, self.python, self.wrapper_properties]:
-            if field is not None:
-                return field
+        for _field in [self.jobtype_extra, self.golang, self.python, self.wrapper_properties]:
+            if _field is not None:
+                return _field
