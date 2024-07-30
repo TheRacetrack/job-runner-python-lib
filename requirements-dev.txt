@@ -1,5 +1,5 @@
 # Testing/sample tools
-pytest==7.2.1
+pytest==8.3.2
 coverage==7.2.1
 backoff==2.2.1
 numpy==1.26.4

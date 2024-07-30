@@ -1,11 +1,11 @@
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 import yaml
 
 from racetrack_client.log.context_error import wrap_context
 from racetrack_client.manifest.manifest import Manifest
-from racetrack_client.utils.datamodel import parse_dict_datamodel, parse_yaml_datamodel, convert_to_yaml
+from racetrack_client.utils.datamodel import parse_dict_datamodel, convert_to_yaml
 from racetrack_client.log.logs import get_logger
 
 logger = get_logger(__name__)
@@ -36,24 +36,6 @@ def load_manifest_from_dict(manifest_dict: Dict) -> Manifest:
         manifest.origin_yaml_ = convert_to_yaml(manifest_dict)
         manifest.origin_dict_ = manifest_dict
         return manifest
-
-
-def parse_manifest_or_empty(manifest_yaml: Optional[str]) -> Optional[Manifest]:
-    """Parse YAML string as Manifest. In case of error return None"""
-    if not manifest_yaml:
-        return None
-    try:
-        manifest_dict = yaml.load(manifest_yaml, Loader=yaml.FullLoader)
-        if manifest_dict is None:
-            manifest_dict = {}
-
-        manifest = parse_dict_datamodel(manifest_dict, Manifest)
-        manifest.origin_yaml_ = manifest_yaml
-        manifest.origin_dict_ = manifest_dict
-        return manifest
-    except Exception as e:
-        logger.error(f'Job Manifest YAML contains syntax error: {e}')
-        return None
 
 
 def get_manifest_path(workdir_or_file: str) -> Path:

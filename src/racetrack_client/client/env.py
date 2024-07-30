@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Dict, Optional
+from dataclasses import dataclass, field
 
 from pydantic import BaseModel
 
@@ -12,9 +13,10 @@ from racetrack_client.log.logs import get_logger
 logger = get_logger(__name__)
 
 
-class SecretVars(BaseModel):
-    build_env: Dict[str, str] = {}
-    runtime_env: Dict[str, str] = {}
+@dataclass
+class SecretVars:
+    build_env: Dict[str, str] = field(default_factory=dict)
+    runtime_env: Dict[str, str] = field(default_factory=dict)
 
 
 def read_secret_vars(workdir: str, manifest: Manifest) -> SecretVars:

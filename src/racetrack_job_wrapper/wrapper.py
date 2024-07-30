@@ -8,6 +8,9 @@ from racetrack_job_wrapper.api import create_api_app
 from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.loader import instantiate_class_entrypoint
 from racetrack_job_wrapper.validate import validate_entrypoint
+from racetrack_client.log.logs import get_logger
+
+logger = get_logger(__name__)
 
 
 def create_entrypoint_app(
@@ -28,6 +31,8 @@ def create_entrypoint_app(
 
 def read_job_manifest() -> Dict[str, Any]:
     manifest_path = Path('job.yaml')
-    assert manifest_path.is_file(), f'manifest file not found at {manifest_path}'
+    if not manifest_path.is_file():
+        logger.warning(f'manifest file not found at {manifest_path}')
+        return {}
     with manifest_path.open() as file:
         return yaml.load(file, Loader=yaml.FullLoader) or {}
