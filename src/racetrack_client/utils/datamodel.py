@@ -52,7 +52,7 @@ def parse_object(obj: Any, clazz: Type[T]) -> T:
         if not left_types:
             raise ValueError(f'none of the union types "{clazz}" match to a given value: {obj}')
         if len(left_types) > 1:
-            raise ValueError(f'too many amiguous union types {left_types} ({clazz}) matching to a given value: {obj}')
+            raise ValueError(f'too many ambiguous union types {left_types} ({clazz}) matching to a given value: {obj}')
         return parse_object(obj, left_types[0])
     elif get_origin(clazz) is None and isinstance(obj, clazz):
         return obj
