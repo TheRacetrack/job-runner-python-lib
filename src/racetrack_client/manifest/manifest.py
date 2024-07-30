@@ -89,10 +89,10 @@ class Manifest:
     # original dictionary from which the manifest was parsed, field for internal use only
     origin_dict_: Optional[Dict[str, Any]] = field(default=None, metadata={'exclude': True})
 
-    def get_jobtype(self):
+    def get_jobtype(self) -> Optional[str]:
         return self.jobtype if self.jobtype else self.lang
 
-    def get_jobtype_extra(self):
+    def get_jobtype_extra(self) -> Optional[Dict[str, Any]]:
         for _field in [self.jobtype_extra, self.golang, self.python, self.wrapper_properties]:
             if _field is not None:
                 return _field

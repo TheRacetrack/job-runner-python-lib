@@ -22,7 +22,7 @@ def parse_dict_datamodel(obj_dict: Dict, clazz: Type[T]) -> T:
 
 def parse_object(obj: Any, clazz: Type[T]) -> T:
     """
-    Cast object value to its expected type
+    Cast object value to its expected type, using annotated types
     :param obj: object value to be transformed into its expected type
     :param clazz: object's expected type
     """
@@ -153,7 +153,7 @@ def dataclass_as_dict(dc) -> Dict:
 
 
 def _dataclass_as_dict_inner(obj):
-    """Convert dataclass to dictionary. Originates from dataclasses.asdict"""
+    """Convert dataclass to dictionary, omitting excluded fields. Originates from dataclasses.asdict"""
     if type(obj) in {types.NoneType, bool, int, float, str, bytes, type}:
         return obj
     elif dataclasses.is_dataclass(obj):
