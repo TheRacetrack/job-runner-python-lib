@@ -4,9 +4,9 @@ import sys
 
 from fastapi import Request
 
-from racetrack_client.log.exception import exception_details
-from racetrack_client.log.logs import get_logger
-from racetrack_client.utils.env import is_env_flag_enabled
+from racetrack_job_wrapper.log.exception import exception_details
+from racetrack_job_wrapper.log.logs import get_logger
+from racetrack_job_wrapper.utils.env import is_env_flag_enabled
 
 logger = get_logger(__name__)
 

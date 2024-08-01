@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.routing import Mount
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.log.logs import get_logger
 
 logger = get_logger(__name__)
 

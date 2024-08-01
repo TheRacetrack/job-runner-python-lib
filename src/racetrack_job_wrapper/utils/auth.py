@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict
 
-from racetrack_client.utils.request import parse_response_object, Requests
+from racetrack_job_wrapper.utils.request import parse_response_object, Requests
 
 
 RT_AUTH_HEADER = 'X-Racetrack-Auth'

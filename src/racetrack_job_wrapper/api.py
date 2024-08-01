@@ -32,11 +32,11 @@ from racetrack_job_wrapper.metrics import (
     setup_entrypoint_metrics,
 )
 from racetrack_job_wrapper.response import to_json_serializable
-from racetrack_client.log.logs import get_logger
-from racetrack_commons.api.asgi.fastapi import create_fastapi
-from racetrack_commons.api.asgi.proxy import mount_at_base_path
-from racetrack_commons.api.metrics import setup_metrics_endpoint
-from racetrack_commons.auth.methods import get_racetrack_authorizations_methods
+from racetrack_job_wrapper.log.logs import get_logger
+from racetrack_job_wrapper.api.asgi.fastapi import create_fastapi
+from racetrack_job_wrapper.api.asgi.proxy import mount_at_base_path
+from racetrack_job_wrapper.api.metrics import setup_metrics_endpoint
+from racetrack_job_wrapper.auth.methods import get_racetrack_authorizations_methods
 
 logger = get_logger(__name__)
 

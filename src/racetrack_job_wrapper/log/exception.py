@@ -2,7 +2,7 @@ import os
 import traceback
 from typing import Collection, Iterable, Tuple
 
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.log.logs import get_logger
 
 logger = get_logger(__name__)
 

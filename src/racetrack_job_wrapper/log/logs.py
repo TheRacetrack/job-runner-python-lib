@@ -4,9 +4,9 @@ import os
 import sys
 from typing import Optional, Dict, Any
 
-from racetrack_client.utils.env import is_env_flag_enabled
-from racetrack_client.utils.strings import strip_ansi_colors
-from racetrack_client.utils.time import timestamp_to_iso8601
+from racetrack_job_wrapper.utils.env import is_env_flag_enabled
+from racetrack_job_wrapper.utils.strings import strip_ansi_colors
+from racetrack_job_wrapper.utils.time import timestamp_to_iso8601
 
 LOG_FORMAT = '\033[2m[%(asctime)s]\033[0m %(levelname)s %(message)s'
 LOG_FORMAT_DEBUG = '\033[2m[%(asctime)s]\033[0m %(name)s %(filename)s %(lineno)s %(levelname)s %(message)s'

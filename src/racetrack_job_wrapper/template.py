@@ -3,9 +3,9 @@ from typing import Dict
 
 from jinja2 import Template
 
-from racetrack_client.manifest.merge import load_merged_manifest
-from racetrack_client.log.logs import get_logger
-from racetrack_client.client.env import merge_env_vars, read_secret_vars_from_file
+from racetrack_job_wrapper.manifest.merge import load_merged_manifest
+from racetrack_job_wrapper.log.logs import get_logger
+from racetrack_job_wrapper.client.env import merge_env_vars, read_secret_vars_from_file
 
 logger = get_logger(__name__)
 JOB_MANIFEST_FILENAME = 'job.yaml'

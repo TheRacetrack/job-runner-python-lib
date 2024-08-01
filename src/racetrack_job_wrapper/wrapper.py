@@ -8,7 +8,7 @@ from racetrack_job_wrapper.api import create_api_app
 from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.loader import instantiate_class_entrypoint
 from racetrack_job_wrapper.validate import validate_entrypoint
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.log.logs import get_logger
 
 logger = get_logger(__name__)
 

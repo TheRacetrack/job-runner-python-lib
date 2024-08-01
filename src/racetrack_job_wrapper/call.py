@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional, Union
 import httpx
 from fastapi import Request
 
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.log.logs import get_logger
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
 
 logger = get_logger(__name__)

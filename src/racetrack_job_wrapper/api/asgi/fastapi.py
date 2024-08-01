@@ -4,9 +4,9 @@ from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 
-from racetrack_commons.api.asgi.access_log import enable_request_access_log, enable_response_access_log
-from racetrack_commons.api.asgi.error_handler import register_error_handlers
-from racetrack_commons.api.asgi.proxy import TrailingSlashForwarder
+from racetrack_job_wrapper.api.asgi.access_log import enable_request_access_log, enable_response_access_log
+from racetrack_job_wrapper.api.asgi.error_handler import register_error_handlers
+from racetrack_job_wrapper.api.asgi.proxy import TrailingSlashForwarder
 
 
 def create_fastapi(

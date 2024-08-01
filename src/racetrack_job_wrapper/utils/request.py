@@ -9,7 +9,7 @@ from urllib.error import HTTPError, URLError
 import urllib.parse as urlparse
 from urllib.parse import urlencode
 
-from racetrack_client.log.context_error import ContextError
+from racetrack_job_wrapper.log.context_error import ContextError
 
 DEBUG_MODE = False  # print the actual bytes sent in requests and responses
 

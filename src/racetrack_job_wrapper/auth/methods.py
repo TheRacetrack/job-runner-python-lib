@@ -1,4 +1,4 @@
-from racetrack_client.utils.auth import RT_AUTH_HEADER, RacetrackAuthMethod
+from racetrack_job_wrapper.utils.auth import RT_AUTH_HEADER, RacetrackAuthMethod
 
 
 def get_racetrack_authorizations_methods():

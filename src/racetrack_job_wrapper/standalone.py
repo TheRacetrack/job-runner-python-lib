@@ -1,16 +1,16 @@
 import threading
 from typing import Type
 
-from racetrack_client.log.logs import configure_logs, get_logger
-from racetrack_commons.api.asgi.asgi_server import serve_asgi_app
+from racetrack_job_wrapper.log.logs import configure_logs, get_logger
+from racetrack_job_wrapper.api.asgi.asgi_server import serve_asgi_app
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
 from racetrack_job_wrapper.api import create_api_app
 from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.wrapper import read_job_manifest
-from racetrack_commons.api.asgi.asgi_reloader import ASGIReloader
+from racetrack_job_wrapper.api.asgi.asgi_reloader import ASGIReloader
 from racetrack_job_wrapper.api import create_health_app
-from racetrack_client.log.context_error import ContextError
-from racetrack_client.log.exception import short_exception_details, log_exception
+from racetrack_job_wrapper.log.context_error import ContextError
+from racetrack_job_wrapper.log.exception import short_exception_details, log_exception
 
 logger = get_logger(__name__)
 
