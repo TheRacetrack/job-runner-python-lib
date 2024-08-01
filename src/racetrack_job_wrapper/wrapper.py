@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any
 import yaml
 from fastapi import FastAPI
 
-from racetrack_job_wrapper.api import create_api_app
+from racetrack_job_wrapper.wrapper_api import create_api_app
 from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.loader import instantiate_class_entrypoint
 from racetrack_job_wrapper.validate import validate_entrypoint

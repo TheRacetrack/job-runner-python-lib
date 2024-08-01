@@ -9,8 +9,8 @@ from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.loader import instantiate_class_entrypoint
 from racetrack_job_wrapper.main import run_configured_entrypoint
 from racetrack_job_wrapper.wrapper import create_api_app
-from racetrack_client.log.logs import configure_logs
-from racetrack_client.utils.request import Requests, RequestError
+from racetrack_job_wrapper.log.logs import configure_logs
+from racetrack_job_wrapper.utils.request import Requests, RequestError
 
 
 def test_health_endpoints():
