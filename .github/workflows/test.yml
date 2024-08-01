@@ -1,0 +1,20 @@
+name: test
+on:
+  push
+
+jobs:
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: make setup-test
+      - name: Run Unit Tests
+        run: . venv/bin/activate && make test

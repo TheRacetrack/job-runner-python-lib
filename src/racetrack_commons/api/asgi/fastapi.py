@@ -7,7 +7,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from racetrack_commons.api.asgi.access_log import enable_request_access_log, enable_response_access_log
 from racetrack_commons.api.asgi.error_handler import register_error_handlers
 from racetrack_commons.api.asgi.proxy import TrailingSlashForwarder
-from racetrack_commons.api.response import register_response_json_encoder
 
 
 def create_fastapi(
@@ -31,8 +30,6 @@ def create_fastapi(
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    register_response_json_encoder()
 
     if handle_errors:
         register_error_handlers(fastapi_app)

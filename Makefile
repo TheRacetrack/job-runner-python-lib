@@ -1,4 +1,4 @@
-.PHONY: venv
+.PHONY: venv test
 
 venv:
 	python3 -m venv venv &&\
@@ -8,6 +8,12 @@ venv:
 	pip install -e .
 	@echo Activate your venv:
 	@echo . venv/bin/activate
+
+setup-test:
+	python3 -m venv venv &&\
+	. venv/bin/activate &&\
+	pip install -r requirements.txt -r requirements-dev.txt &&\
+	pip install -e .
 
 test:
 	cd tests && python -m pytest -vv --tb=short -ra $(test)

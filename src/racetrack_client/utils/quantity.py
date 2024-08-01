@@ -1,14 +1,5 @@
 from functools import total_ordering
 import re
-from typing import Any, Dict, Optional
-
-from pydantic_core import core_schema
-from pydantic import (
-    BeforeValidator,
-    PlainSerializer,
-    GetJsonSchemaHandler,
-)
-from typing_extensions import Annotated
 
 
 @total_ordering
@@ -90,28 +81,3 @@ class Quantity:
     def plain_number(self) -> float:
         """Convert quantity to a plain number without any suffixes"""
         return self.base_number * self._suffix_multipliers[self.suffix]
-
-    @classmethod
-    def __get_pydantic_json_schema__(
-        cls, core_schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
-    ) -> Dict[str, Any]:
-        return {'type': 'string'}
-
-
-def _parse_quantity(v) -> Optional[Quantity]:
-    if v is None:
-        return None
-    return Quantity(str(v))
-
-
-def _serialize_quantity(q: Quantity) -> Optional[str]:
-    if q is None:
-        return None
-    return str(q)
-
-
-AnnotatedQuantity = Annotated[
-    Quantity, str,
-    BeforeValidator(_parse_quantity),
-    PlainSerializer(_serialize_quantity),
-]
