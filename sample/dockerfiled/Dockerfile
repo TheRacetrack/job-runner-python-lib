@@ -17,5 +17,3 @@ RUN chmod -R a+rw /src/job/
 
 CMD ["bash", "-c", "python -u main.py"]
 LABEL racetrack-component="job"
-ENV JOB_NAME "{{ manifest.name }}"
-ENV JOB_VERSION "{{ manifest.version }}"

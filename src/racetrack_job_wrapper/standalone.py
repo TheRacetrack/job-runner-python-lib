@@ -7,7 +7,7 @@ from racetrack_job_wrapper.api.asgi.asgi_reloader import ASGIReloader
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
 from racetrack_job_wrapper.wrapper_api import create_api_app, create_health_app
 from racetrack_job_wrapper.health import HealthState
-from racetrack_job_wrapper.wrapper import read_job_manifest
+from racetrack_job_wrapper.wrapper import read_job_manifest_dict
 from racetrack_job_wrapper.log.context_error import ContextError
 from racetrack_job_wrapper.log.exception import short_exception_details, log_exception
 
@@ -50,7 +50,7 @@ def serve_job_instance(entrypoint: JobEntrypoint):
     but if your job initialization takes some time, use `serve_job_class` instead.
     """
     health_state = HealthState(live=True, ready=True)
-    manifest_dict = read_job_manifest()
+    manifest_dict = read_job_manifest_dict()
     app = create_api_app(entrypoint, health_state, manifest_dict)
     serve_asgi_app(app, http_addr='0.0.0.0', http_port=7000)
 
@@ -66,7 +66,7 @@ def _late_init(
         logger.info('Job instance created')
 
         health_state = HealthState(live=True, ready=True)
-        manifest_dict = read_job_manifest()
+        manifest_dict = read_job_manifest_dict()
         fastapi_app = create_api_app(entrypoint, health_state, manifest_dict)
 
         app_reloader.mount(fastapi_app)
