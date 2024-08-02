@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -25,14 +26,17 @@ def create_entrypoint_app(
     if health_state is None:
         health_state = HealthState(live=True, ready=True)
     if manifest_dict is None:
-        manifest_dict = read_job_manifest()
+        manifest_dict = read_job_manifest_dict()
     return create_api_app(entrypoint, health_state, manifest_dict)
 
 
-def read_job_manifest() -> Dict[str, Any]:
+def read_job_manifest_dict() -> Dict[str, Any]:
+    job_manifest_yaml = os.environ.get('JOB_MANIFEST_YAML', '')
+    if job_manifest_yaml:
+        return yaml.safe_load(job_manifest_yaml)
     manifest_path = Path('job.yaml')
-    if not manifest_path.is_file():
-        logger.warning(f'manifest file not found at {manifest_path}')
-        return {}
-    with manifest_path.open() as file:
-        return yaml.load(file, Loader=yaml.FullLoader) or {}
+    if manifest_path.is_file():
+        with manifest_path.open() as file:
+            return yaml.load(file, Loader=yaml.FullLoader) or {}
+    logger.warning(f'manifest yaml not found in JOB_MANIFEST_YAML env var')
+    return {}
