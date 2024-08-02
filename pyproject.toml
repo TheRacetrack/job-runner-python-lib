@@ -1,6 +1,6 @@
 [project]
 name = "racetrack_job_wrapper"
-version = "1.16.3"
+version = "1.16.4"
 description = "Racetrack Job Runner"
 license = {text = "Apache License 2.0"}
 authors = [
