@@ -32,8 +32,6 @@ include-package-data = true
 [tool.setuptools.packages.find]
 where = ["src"]  # list of folders that contain the packages (["."] by default)
 include = [  # package names should match these glob patterns (["*"] by default)
-    "racetrack_client*",
-    "racetrack_commons*",
     "racetrack_job_wrapper*",
 ]
 exclude = []

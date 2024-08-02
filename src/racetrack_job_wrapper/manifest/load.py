@@ -3,10 +3,10 @@ from typing import Dict
 
 import yaml
 
-from racetrack_client.log.context_error import wrap_context
-from racetrack_client.manifest.manifest import Manifest
-from racetrack_client.utils.datamodel import parse_dict_datamodel, convert_to_yaml
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.log.context_error import wrap_context
+from racetrack_job_wrapper.manifest.manifest import Manifest
+from racetrack_job_wrapper.utils.datamodel import parse_dict_datamodel, convert_to_yaml
+from racetrack_job_wrapper.log.logs import get_logger
 
 logger = get_logger(__name__)
 

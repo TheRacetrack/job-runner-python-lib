@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from racetrack_client.utils.datamodel import parse_dict_datamodel, to_serializable
+from racetrack_job_wrapper.utils.datamodel import parse_dict_datamodel, to_serializable
 
 
 def test_parse_nested_dataclasses():

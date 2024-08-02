@@ -3,7 +3,7 @@ import sys
 
 from racetrack_job_wrapper.server import run_configured_entrypoint
 from racetrack_job_wrapper.template import render_template
-from racetrack_client.log.logs import configure_logs, get_logger
+from racetrack_job_wrapper.log.logs import configure_logs, get_logger
 
 logger = get_logger(__name__)
 

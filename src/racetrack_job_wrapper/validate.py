@@ -1,9 +1,9 @@
 import json
 
-from racetrack_client.utils.datamodel import to_serializable
+from racetrack_job_wrapper.utils.datamodel import to_serializable
 from racetrack_job_wrapper.docs import get_input_example
 from racetrack_job_wrapper.entrypoint import JobEntrypoint, list_auxiliary_endpoints
-from racetrack_client.log.context_error import wrap_context
+from racetrack_job_wrapper.log.context_error import wrap_context
 
 
 MAX_INPUT_EXAMPLE_JSON_SIZE = 1024 * 1024  # 1MB

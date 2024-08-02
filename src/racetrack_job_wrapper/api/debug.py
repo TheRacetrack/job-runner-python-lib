@@ -1,6 +1,6 @@
 import os
 
-from racetrack_client.utils.env import is_env_flag_enabled
+from racetrack_job_wrapper.utils.env import is_env_flag_enabled
 
 
 def debug_mode_enabled() -> bool:

@@ -4,10 +4,10 @@ import sys
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from racetrack_client.log.errors import EntityNotFound, AlreadyExists, ValidationError
-from racetrack_commons.api.metrics import metric_internal_server_errors
-from racetrack_commons.api.tracing import log_request_exception_with_tracing
-from racetrack_commons.auth.auth import UnauthorizedError
+from racetrack_job_wrapper.log.errors import EntityNotFound, AlreadyExists, ValidationError
+from racetrack_job_wrapper.api.metrics import metric_internal_server_errors
+from racetrack_job_wrapper.api.tracing import log_request_exception_with_tracing
+from racetrack_job_wrapper.auth.auth import UnauthorizedError
 
 
 def register_error_handlers(api: FastAPI):

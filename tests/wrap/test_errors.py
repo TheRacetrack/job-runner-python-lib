@@ -1,4 +1,4 @@
-from racetrack_job_wrapper.api import create_api_app
+from racetrack_job_wrapper.wrapper_api import create_api_app
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
 from racetrack_job_wrapper.health import HealthState
 from fastapi.testclient import TestClient

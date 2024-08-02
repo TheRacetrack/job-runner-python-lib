@@ -11,10 +11,10 @@ from uvicorn.config import LOGGING_CONFIG
 from uvicorn.logging import DefaultFormatter, AccessFormatter
 from starlette.types import ASGIApp
 
-from racetrack_client.log.exception import log_exception
-from racetrack_client.log.logs import get_logger, ColoredFormatter
-from racetrack_client.utils.env import is_env_flag_enabled
-from racetrack_commons.api.debug import is_deployment_local
+from racetrack_job_wrapper.log.exception import log_exception
+from racetrack_job_wrapper.log.logs import get_logger, ColoredFormatter
+from racetrack_job_wrapper.utils.env import is_env_flag_enabled
+from racetrack_job_wrapper.api.debug import is_deployment_local
 
 logger = get_logger(__name__)
 
@@ -94,14 +94,14 @@ def _setup_uvicorn_logs(access_log: bool):
     else:
         LOGGING_CONFIG["formatters"]["default"]["fmt"] = "[%(asctime)s] %(levelname)s %(message)s"
     LOGGING_CONFIG["formatters"]["default"]["datefmt"] = "%Y-%m-%d %H:%M:%S"
-    LOGGING_CONFIG["formatters"]["default"]["()"] = "racetrack_commons.api.asgi.asgi_server.ColoredDefaultFormatter"
+    LOGGING_CONFIG["formatters"]["default"]["()"] = "racetrack_job_wrapper.api.asgi.asgi_server.ColoredDefaultFormatter"
 
     if sys.stdout.isatty():
         LOGGING_CONFIG["formatters"]["access"]["fmt"] = "\033[2m[%(asctime)s]\033[0m %(levelname)s %(name)s: %(request_line)s %(status_code)s"
     else:
         LOGGING_CONFIG["formatters"]["access"]["fmt"] = "[%(asctime)s] %(levelname)s %(request_line)s %(status_code)s"
     LOGGING_CONFIG["formatters"]["access"]["datefmt"] = "%Y-%m-%d %H:%M:%S"
-    LOGGING_CONFIG["formatters"]["access"]["()"] = "racetrack_commons.api.asgi.asgi_server.ColoredAccessFormatter"
+    LOGGING_CONFIG["formatters"]["access"]["()"] = "racetrack_job_wrapper.api.asgi.asgi_server.ColoredAccessFormatter"
 
     LOGGING_CONFIG["handlers"]["default"]["stream"] = 'ext://sys.stdout'
     LOGGING_CONFIG["handlers"]["default"]["level"] = 'INFO'
@@ -111,7 +111,7 @@ def _setup_uvicorn_logs(access_log: bool):
 
     LOGGING_CONFIG["filters"] = {
         "needless_requests": {
-            "()": 'racetrack_commons.api.asgi.asgi_server.NeedlessRequestsFilter',
+            "()": 'racetrack_job_wrapper.api.asgi.asgi_server.NeedlessRequestsFilter',
         },
     }
 
@@ -132,8 +132,8 @@ def _setup_uvicorn_logs(access_log: bool):
         LOGGING_CONFIG["loggers"]["uvicorn.access"]["handlers"] = []
 
     if is_env_flag_enabled('LOG_STRUCTURED', 'false'):
-        LOGGING_CONFIG["formatters"]["default"]["()"] = "racetrack_client.log.logs.StructuredFormatter"
-        LOGGING_CONFIG["formatters"]["access"]["()"] = "racetrack_client.log.logs.StructuredFormatter"
+        LOGGING_CONFIG["formatters"]["default"]["()"] = "racetrack_job_wrapper.log.logs.StructuredFormatter"
+        LOGGING_CONFIG["formatters"]["access"]["()"] = "racetrack_job_wrapper.log.logs.StructuredFormatter"
 
 
 class ColoredDefaultFormatter(logging.Formatter):

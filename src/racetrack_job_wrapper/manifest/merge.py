@@ -3,9 +3,9 @@ from typing import Dict, List
 
 import yaml
 
-from racetrack_client.log.context_error import wrap_context
-from racetrack_client.manifest import Manifest
-from racetrack_client.manifest.load import load_manifest_dict_from_yaml, load_manifest_from_dict
+from racetrack_job_wrapper.log.context_error import wrap_context
+from racetrack_job_wrapper.manifest import Manifest
+from racetrack_job_wrapper.manifest.load import load_manifest_dict_from_yaml, load_manifest_from_dict
 
 
 def load_merged_manifest(manifest_path: Path, extra_vars: Dict[str, str]) -> Manifest:

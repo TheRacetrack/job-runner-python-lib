@@ -4,7 +4,7 @@ from prometheus_client import Counter, Histogram
 from prometheus_client.exposition import make_wsgi_app
 from prometheus_client.registry import REGISTRY
 
-from racetrack_commons.api.asgi.proxy import TrailingSlashForwarder
+from racetrack_job_wrapper.api.asgi.proxy import TrailingSlashForwarder
 
 metric_internal_server_errors = Counter(
     'commons_internal_server_errors',

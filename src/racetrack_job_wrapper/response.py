@@ -1,6 +1,6 @@
 from typing import Any
 
-from racetrack_client.utils.datamodel import to_serializable
+from racetrack_job_wrapper.utils.datamodel import to_serializable
 
 
 def to_json_serializable(obj: Any) -> Any:

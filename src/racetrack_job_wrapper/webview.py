@@ -8,8 +8,8 @@ from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
 from a2wsgi import WSGIMiddleware
 
-from racetrack_commons.api.asgi.proxy import TrailingSlashForwarder, mount_at_base_path
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.api.asgi.proxy import TrailingSlashForwarder, mount_at_base_path
+from racetrack_job_wrapper.log.logs import get_logger
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
 
 logger = get_logger(__name__)

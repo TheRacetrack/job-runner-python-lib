@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Type, Optional
 
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
-from racetrack_client.log.logs import get_logger
+from racetrack_job_wrapper.log.logs import get_logger
 
 logger = get_logger(__name__)
 

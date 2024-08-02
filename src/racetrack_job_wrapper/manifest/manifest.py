@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 
-from racetrack_client.utils.quantity import Quantity
+from racetrack_job_wrapper.utils.quantity import Quantity
 
 
 @dataclass
