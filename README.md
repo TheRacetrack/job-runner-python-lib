@@ -96,6 +96,63 @@ make run-docker
 racetrack deploy sample/dockerfiled
 ```
 
+## Job configuration
+You may tweak additional features of your job by specifying extra fields in a `job.yaml` manifest:
+
+```yaml
+jobtype_extra:
+  max_concurrency: 1
+  max_concurrency_queue: 10
+  home_page: '/api/v1/webview'
+```
+
+Manifest YAML will be passed as environment variable to the Job by Racetrack's infrastructure plugin.
+That's how this library can access this configuration.
+
+### Concurrent requests cap
+Maximum number of concurrent requests can be limited by `jobtype_extra.max_concurrency` field:
+By default, concurrent requests are unlimited. Setting `max_concurrency` to `1` will make the job
+process requests one by one. Overdue requests will be queued and processed in order.
+
+Having such concurrency limits may cause some requests to wait in a queue.
+If a throughput is higher than the job can handle, the queue will grow indefinitely.
+To prevent that, you can set `jobtype_extra.max_concurrency_queue` to limit the queue size.
+When the queue is full, the job will return `429 Too Many Requests` status code.
+
+Example (1 request at a time, with up to 10 requests waiting in a queue):
+```yaml
+jobtype_extra:
+  max_concurrency: 1
+  max_concurrency_queue: 10
+```
+
+### Home page
+You can configure the home page of your job.
+Home page is the one you see when opening a job through the Dashboard or at the root endpoint.
+By default, it shows the SwaggerUI page. Now you can change it, for instance, to a webview endpoint:
+```yaml
+jobtype_extra:
+  home_page: '/api/v1/webview'
+```
+
+### Caller name
+Setting environment variable `LOG_CALLER_NAME=true` allows you to keep record of a caller in the job's logs.
+```dockerfile
+ENV LOG_CALLER_NAME "true"
+```
+This will add caller identity (username or ESC name) to every log entry.
+
+### Logging
+To produce logs, use `logging` module inside your job:
+```python
+import logging
+logger = logging.getLogger(__name__)
+
+class JobEntrypoint:
+    def perform(self):
+        logger.info('something happened')
+```
+
 ## Comparison with Python job type
 This library has been originated from
 [Python job type plugin](https://github.com/TheRacetrack/plugin-python-job-type).
