@@ -24,8 +24,7 @@ run-local:
 
 build-docker:
 	cd sample/dockerfiled &&\
-	racetrack_job_wrapper template Dockerfile Dockerfile.templated &&\
-	docker buildx build -t sample-primer-job:latest -f Dockerfile.templated .
+	docker buildx build -t sample-primer-job:latest -f Dockerfile .
 
 run-docker: build-docker
 	docker run --rm -it --name sample-primer-job -p 7000:7000 sample-primer-job:latest
