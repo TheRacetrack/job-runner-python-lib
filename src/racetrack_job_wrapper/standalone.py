@@ -65,7 +65,6 @@ def _late_init(
         entrypoint = entrypoint_class()
         logger.info('Job instance created')
 
-        health_state = HealthState(live=True, ready=True)
         manifest_dict = read_job_manifest_dict()
         fastapi_app = create_api_app(entrypoint, health_state, manifest_dict)
 
