@@ -6,6 +6,7 @@ from fastapi import Request
 
 from racetrack_job_wrapper.log.logs import get_logger
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
+from racetrack_job_wrapper.recordkeeper import set_rk_headers
 
 logger = get_logger(__name__)
 
@@ -112,6 +113,7 @@ def async_job_call(
             request: Request = getattr(entrypoint, 'request_context').get()
             outgoing_headers[tracing_header] = request.headers.get(tracing_header) or ''
             outgoing_headers[caller_header] = request.headers.get(caller_header) or ''
+        set_rk_headers(outgoing_headers, entrypoint)
 
         url = f'{internal_pub_url}/async/new/job/{job_name}/{version}{path}'
         response = httpx.request(method.upper(), url, json=payload, headers=outgoing_headers)
@@ -164,6 +166,7 @@ def _prepare_request(
         request: Request = getattr(entrypoint, 'request_context').get()
         outgoing_headers[tracing_header] = request.headers.get(tracing_header) or ''
         outgoing_headers[caller_header] = request.headers.get(caller_header) or ''
+    set_rk_headers(outgoing_headers, entrypoint)
 
     request: httpx.Request = http_client.build_request(method.upper(), url, json=payload, headers=outgoing_headers)
     return request
