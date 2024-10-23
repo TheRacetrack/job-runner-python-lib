@@ -16,7 +16,8 @@ def main():
     subparser.add_argument(
         'entrypoint_path', default='', nargs='?', help='path to a Python file with an entrypoint class'
     )
-    subparser.add_argument('entrypoint_classname', default='', nargs='?')
+    subparser.add_argument('entrypoint_classname', default='', nargs='?', help='Name of the Python class of the Job entrypoint')
+    subparser.add_argument('--manifest-path', default=None, nargs='?', help='path to a Job manifest YAML file')
     subparser.add_argument('--port', type=int, default=None, nargs='?', help='HTTP port to run the server on')
     subparser.set_defaults(func=run_entrypoint)
 
@@ -36,7 +37,8 @@ def main():
 def run_entrypoint(args: argparse.Namespace):
     """Load entrypoint class and run it embedded in a HTTP server"""
     http_port = args.port or 7000
-    run_configured_entrypoint(http_port, args.entrypoint_path, args.entrypoint_classname)
+    manifest_path = args.manifest_path
+    run_configured_entrypoint(http_port, args.entrypoint_path, args.entrypoint_classname, manifest_path)
 
 
 def _render_template(args: argparse.Namespace):
