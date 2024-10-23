@@ -8,7 +8,7 @@ from racetrack_job_wrapper.api.asgi.asgi_reloader import ASGIReloader
 from racetrack_job_wrapper.api.asgi.asgi_server import serve_asgi_app
 from racetrack_job_wrapper.wrapper_api import create_health_app
 from racetrack_job_wrapper.health import HealthState
-from racetrack_job_wrapper.wrapper import create_entrypoint_app
+from racetrack_job_wrapper.wrapper import create_entrypoint_app, read_job_manifest_dict
 
 logger = get_logger(__name__)
 
@@ -17,6 +17,7 @@ def run_configured_entrypoint(
     http_port: int,
     entrypoint_path: str,
     entrypoint_classname: Optional[str] = None,
+    manifest_path: Optional[str] = None,
 ):
     """
     Load entrypoint class and run it embedded in a HTTP server with given configuration.
@@ -29,27 +30,26 @@ def run_configured_entrypoint(
     app_reloader = ASGIReloader()
     app_reloader.mount(health_app)
 
-    thread = threading.Thread(
+    threading.Thread(
         target=_late_init,
-        args=(entrypoint_path, entrypoint_classname, health_state, app_reloader),
+        args=(entrypoint_path, entrypoint_classname, manifest_path, health_state, app_reloader),
         daemon=True,
-    )
-    thread.start()
+    ).start()
 
-    serve_asgi_app(
-        app_reloader, http_addr='0.0.0.0', http_port=http_port,
-    )
+    serve_asgi_app(app_reloader, http_addr='0.0.0.0', http_port=http_port)
 
 
 def _late_init(
     entrypoint_path: str,
     entrypoint_classname: Optional[str],
+    manifest_path: Optional[str],
     health_state: HealthState,
     app_reloader: ASGIReloader,
 ):
     try:
+        manifest_dict = read_job_manifest_dict(manifest_path=manifest_path)
         fastapi_app = create_entrypoint_app(
-            entrypoint_path, class_name=entrypoint_classname, health_state=health_state,
+            entrypoint_path, class_name=entrypoint_classname, health_state=health_state, manifest_dict=manifest_dict,
         )
         app_reloader.mount(fastapi_app)
 

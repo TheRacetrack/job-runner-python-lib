@@ -1,0 +1,2 @@
+prune tests
+include src/racetrack_job_wrapper/py.typed

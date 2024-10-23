@@ -31,15 +31,21 @@ def create_entrypoint_app(
     return create_api_app(entrypoint, health_state, manifest_dict)
 
 
-def read_job_manifest_dict() -> Dict[str, Any]:
+def read_job_manifest_dict(manifest_path: Optional[str] = None) -> Dict[str, Any]:
     with wrap_context('reading job manifest'):
+        if manifest_path:
+            job_manifest_yaml = Path(manifest_path).read_text()
+            return yaml.safe_load(job_manifest_yaml)
+
         job_manifest_yaml = os.environ.get('JOB_MANIFEST_YAML', '')
         if job_manifest_yaml:
             job_manifest_yaml = job_manifest_yaml.replace('\\n', '\n')
             return yaml.safe_load(job_manifest_yaml)
+
         manifest_path = Path('job.yaml')
         if manifest_path.is_file():
             with manifest_path.open() as file:
                 return yaml.load(file, Loader=yaml.FullLoader) or {}
+
         logger.warning(f'manifest yaml not found in JOB_MANIFEST_YAML env var')
         return {}

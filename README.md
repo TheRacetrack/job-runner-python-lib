@@ -15,16 +15,18 @@ Check out [Changelog](./docs/CHANGELOG.md) to find out about notable changes.
 ## Installation
 You can locally install this Job runner to your local environment by doing:
 ```sh
+pip install racetrack-job-runner
+```
+or
+```sh
 pip install "git+https://github.com/TheRacetrack/job-runner-python-lib.git@master"
 ```
 
-This will install `racetrack_job_wrapper` package that can be imported later on.
+This will install `racetrack_job_runner` CLI executable
+along with `racetrack_job_wrapper` module that can be imported later on.
 
-## Sample job
-See a [sample dockerfile job](./sample/dockerfiled) using this library in action.
-
-Assuming you have a Job class like this:  
-#### **`job.py`**
+## Example 1: Run Python class with CLI executable
+Create a sample Job class `job.py` like this:  
 ```python
 import math
 
@@ -43,26 +45,18 @@ class Job:
         return {'number': 7907}
 ```
 
-You can run it inside an API server (and provide a lot of extra features)
-by calling `racetrack_job_wrapper.standalone.serve_job_class` function in your Python program,
-combined with your `Job` class:  
-#### **`main.py`**
-```python
-from racetrack_job_wrapper.standalone import serve_job_class
-from job import Job
-
-def main():
-    serve_job_class(Job)
-
-if __name__ == '__main__':
-    main()
+Now you can run it on localhost inside an API server
+by calling this command in the terminal:
+```sh
+racetrack_job_runner run job.py
 ```
 
-This will run your Job at `0.0.0.0:7000`.
+This will run your Job at [0.0.0.0:7000](http://0.0.0.0:7000). You can visit it in your browser.
 
-This single line `serve_job_class(Job)` does a lot of things, including:
+This runner does a lot of things, including:
 
-- Serve a Job at HTTP API server
+- Serve a Job at HTTP API server.
+  It calls your Python `def perform` method whenever it receives a request to `/api/v1/perform`.
 - Serve automatically generated SwaggerUI documentation
 - Measure and serve Prometheus metrics at `/metrics` endpoint, reporting:
   - how many times the job was called
@@ -78,20 +72,51 @@ This single line `serve_job_class(Job)` does a lot of things, including:
 - Keep record of a caller in the logs
 - Show exemplary input payload in documentation (if defined in a Job's entrypoint)
 
+## Example 2: Run from Python code
+Alternatively, you can launch the job runner from your Python code.
+See a [sample dockerfile job](./sample/dockerfiled) using this library in action.
+
+Assuming you have a Job class [job.py](./sample/dockerfiled/job.py),
+you can run it inside an API server (and provide a lot of extra features).
+Call `racetrack_job_wrapper.standalone.serve_job_class` function in your Python program,
+combined with your `Job` class:  
+#### **`main.py`**
+```python
+from racetrack_job_wrapper.standalone import serve_job_class
+from job import Job
+
+def main():
+    serve_job_class(Job)
+
+if __name__ == '__main__':
+    main()
+```
+
+Execute `python main.py` and this will run your Job at `0.0.0.0:7000` just as in the example 1.
+
 ## Running modes
-### 1. Run on localhost
+There are several ways to run the same job.
+
+### 1. Run on localhost with CLI executable
+```shell
+racetrack_job_runner run sample/dockerfiled/job.py
+```
+
+### 2. Run on localhost from Python
 ```shell
 cd sample/dockerfiled
 export JOB_NAME=primer JOB_VERSION=0.0.1
 python main.py
 ```
 
-### 2. Run in Docker
+### 3. Run in Docker
 ```shell
-make run-docker
+cd sample/dockerfiled &&\
+docker buildx build -t sample-primer-job:latest -f Dockerfile .
+docker run --rm -it --name sample-primer-job -p 7000:7000 sample-primer-job:latest
 ```
 
-### 3. Run on Racetrack
+### 4. Run on Racetrack
 ```shell
 racetrack deploy sample/dockerfiled
 ```
@@ -162,4 +187,4 @@ and do the same in your individual Job's Dockerfile.
 
 In contrast to Python job type plugin, you directly call the utility functions in your code, you bind the things together.
 This is opposed to a job type, where the framework calls your code.
-This project transitions from a framework into a library, giving you more control.
+This project transitions from a framework into a library approach, giving you more control.

@@ -78,8 +78,8 @@ def create_api_app(
     manifest_dict: Dict[str, Any] = {},
 ) -> FastAPI:
     """Create FastAPI app and register all endpoints without running a server"""
-    job_name = os.environ.get('JOB_NAME', '')
-    job_version = os.environ.get('JOB_VERSION', '')
+    job_name = os.environ.get('JOB_NAME') or manifest_dict.get('name') or 'JOB_NAME'
+    job_version = os.environ.get('JOB_VERSION') or manifest_dict.get('version') or 'JOB_VERSION'
     base_url = f'/pub/job/{job_name}/{job_version}'
     jobtype_extra: Dict[str, Any] = manifest_dict.get('jobtype_extra') or {}
     home_page = jobtype_extra.get('home_page') or '/docs'
