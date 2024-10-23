@@ -31,3 +31,14 @@ run-docker: build-docker
 
 run-racetrack:
 	racetrack deploy sample/dockerfiled
+
+clean:
+	rm -rf build/
+	rm -rf dist/
+	rm -rf ./*.egg-info
+
+build:
+	python3 -m build --sdist --wheel
+
+release: clean build
+	python3 -m twine upload -u __token__ dist/*
