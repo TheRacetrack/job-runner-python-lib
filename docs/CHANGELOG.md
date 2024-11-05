@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Memory profiler (memray) can be enabled and managed at runtime by endpoints.
   The reports can be downloaded without the need for the Kubernetes operator to be involved in this process
-  See [Memory profiler](./memory-profiler.md).
+  See [Memory profiler guide](./memory-profiler.md).
 
 ## [1.16.8] - 2024-10-23
 ### Added
