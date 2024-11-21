@@ -30,6 +30,14 @@ by adding this to your Dockerfile:
 RUN chmod -R a+rw /src/job/
 ```
 
+### Enabling Memory Leaks View
+
+If you want to turn on the [Memory Leaks View](https://bloomberg.github.io/memray/flamegraph.html#memory-leaks-view)
+in the flamegraph, you can do it by setting this environment flag:
+```shell
+MEMRAY_LEAKS=true
+```
+
 ## Endpoints
 
 Check out SwaggerUI at the main page of a Job for more details and to call these endpoints in a convenient way. (All endpoints may be prepended with `/pub/job/JOB_NAME/JOB_VERSION/` prefix)

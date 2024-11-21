@@ -30,7 +30,7 @@ class MemoryProfiler:
         if cls.REPORT_FILE_PATH.is_file():
             logger.warning(f'Deleting previous memory report at {cls.REPORT_FILE_PATH}')
             cls.REPORT_FILE_PATH.unlink()
-        cls.tracker = memray.Tracker(cls.REPORT_FILE_PATH)
+        cls.tracker = memray.Tracker(cls.REPORT_FILE_PATH, trace_python_allocators=True)
         cls.tracker.__enter__()
         logger.info('Memory profiler started')
 
@@ -54,7 +54,8 @@ class MemoryProfiler:
             raise ValueError(f'Memory report not found at {cls.REPORT_FILE_PATH}')
         if cls.FLAMEGRAPH_FILE_PATH.is_file():
             cls.FLAMEGRAPH_FILE_PATH.unlink()
-        shell(f'python -m memray flamegraph -o {cls.FLAMEGRAPH_FILE_PATH} {cls.REPORT_FILE_PATH}')
+        leaks_flag = '--leaks' if is_env_flag_enabled('MEMRAY_LEAKS', 'false') else ''
+        shell(f'python -m memray flamegraph {leaks_flag} -o {cls.FLAMEGRAPH_FILE_PATH} {cls.REPORT_FILE_PATH}')
         return cls.FLAMEGRAPH_FILE_PATH.read_bytes()
 
     @classmethod
