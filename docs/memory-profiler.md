@@ -24,6 +24,12 @@ runtime_env:
 This will make the Job to **start the [memray](https://bloomberg.github.io/memray/overview.html) profiler at its startup, make sure to turn it off afterward**. 
 This will also bring up new endpoints to manage it.
 
+If you're running the job in Docker, set the write permissions to the job's main directory
+by adding this to your Dockerfile:
+```Dockerfile
+RUN chmod -R a+rw /src/job/
+```
+
 ## Endpoints
 
 Check out SwaggerUI at the main page of a Job for more details and to call these endpoints in a convenient way. (All endpoints may be prepended with `/pub/job/JOB_NAME/JOB_VERSION/` prefix)
