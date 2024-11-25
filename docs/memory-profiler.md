@@ -36,6 +36,13 @@ If you want to turn on the [Memory Leaks View](https://bloomberg.github.io/memra
 in the flamegraph, you can do it by setting this environment flag:
 ```shell
 MEMRAY_LEAKS=true
+PYTHONMALLOC=malloc
+```
+or
+```yaml
+runtime_env:
+  MEMRAY_LEAKS: true
+  PYTHONMALLOC: malloc
 ```
 
 ## Endpoints

@@ -18,8 +18,12 @@ class MemoryProfiler:
     FLAMEGRAPH_FILE_PATH = Path('/tmp/racetrack-memray-flamegraph.html')
 
     @classmethod
-    def is_enabled(cls):
+    def is_enabled(cls) -> bool:
         return is_env_flag_enabled('MEMRAY_PROFILER', 'false')
+
+    @classmethod
+    def is_leaks_enabled(cls) -> bool:
+        return is_env_flag_enabled('MEMRAY_LEAKS', 'false')
 
     @classmethod
     def start(cls):
@@ -54,7 +58,9 @@ class MemoryProfiler:
             raise ValueError(f'Memory report not found at {cls.REPORT_FILE_PATH}')
         if cls.FLAMEGRAPH_FILE_PATH.is_file():
             cls.FLAMEGRAPH_FILE_PATH.unlink()
-        leaks_flag = '--leaks' if is_env_flag_enabled('MEMRAY_LEAKS', 'false') else ''
+        if cls.is_leaks_enabled():
+            logger.debug('Generating flamegraph report with memory leaks')
+        leaks_flag = '--leaks' if cls.is_leaks_enabled() else ''
         shell(f'python -m memray flamegraph {leaks_flag} -o {cls.FLAMEGRAPH_FILE_PATH} {cls.REPORT_FILE_PATH}')
         return cls.FLAMEGRAPH_FILE_PATH.read_bytes()
 
