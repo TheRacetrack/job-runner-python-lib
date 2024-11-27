@@ -5,6 +5,7 @@ from racetrack_job_wrapper.log.logs import configure_logs, get_logger
 from racetrack_job_wrapper.api.asgi.asgi_server import serve_asgi_app
 from racetrack_job_wrapper.api.asgi.asgi_reloader import ASGIReloader
 from racetrack_job_wrapper.entrypoint import JobEntrypoint
+from racetrack_job_wrapper.profiler import MemoryProfiler
 from racetrack_job_wrapper.wrapper_api import create_api_app, create_health_app
 from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.wrapper import read_job_manifest_dict
@@ -23,6 +24,8 @@ def serve_job_class(entrypoint_class: Type[JobEntrypoint]):
     """
     configure_logs(log_level='debug')
 
+    MemoryProfiler.start()
+
     health_state = HealthState()
     health_app = create_health_app(health_state)
     app_reloader = ASGIReloader()
@@ -34,7 +37,10 @@ def serve_job_class(entrypoint_class: Type[JobEntrypoint]):
         daemon=True,
     ).start()
 
-    serve_asgi_app(app_reloader, http_addr='0.0.0.0', http_port=7000)
+    def on_shutdown():
+        MemoryProfiler.stop()
+
+    serve_asgi_app(app_reloader, http_addr='0.0.0.0', http_port=7000, on_shutdown=on_shutdown)
 
 
 def serve_job_instance(entrypoint: JobEntrypoint):
@@ -49,10 +55,15 @@ def serve_job_instance(entrypoint: JobEntrypoint):
 
     but if your job initialization takes some time, use `serve_job_class` instead.
     """
+    MemoryProfiler.start()
     health_state = HealthState(live=True, ready=True)
     manifest_dict = read_job_manifest_dict()
     app = create_api_app(entrypoint, health_state, manifest_dict)
-    serve_asgi_app(app, http_addr='0.0.0.0', http_port=7000)
+
+    def on_shutdown():
+        MemoryProfiler.stop()
+
+    serve_asgi_app(app, http_addr='0.0.0.0', http_port=7000, on_shutdown=on_shutdown)
 
 
 def _late_init(

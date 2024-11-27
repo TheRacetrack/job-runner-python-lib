@@ -6,6 +6,7 @@ from racetrack_job_wrapper.log.exception import short_exception_details, log_exc
 from racetrack_job_wrapper.log.logs import get_logger
 from racetrack_job_wrapper.api.asgi.asgi_reloader import ASGIReloader
 from racetrack_job_wrapper.api.asgi.asgi_server import serve_asgi_app
+from racetrack_job_wrapper.profiler import MemoryProfiler
 from racetrack_job_wrapper.wrapper_api import create_health_app
 from racetrack_job_wrapper.health import HealthState
 from racetrack_job_wrapper.wrapper import create_entrypoint_app, read_job_manifest_dict
@@ -24,9 +25,10 @@ def run_configured_entrypoint(
     First, start simple health monitoring server at once.
     Next, do the late init in background and serve proper entrypoint endpoints eventually.
     """
+    MemoryProfiler.start()
+
     health_state = HealthState()
     health_app = create_health_app(health_state)
-
     app_reloader = ASGIReloader()
     app_reloader.mount(health_app)
 
@@ -36,7 +38,10 @@ def run_configured_entrypoint(
         daemon=True,
     ).start()
 
-    serve_asgi_app(app_reloader, http_addr='0.0.0.0', http_port=http_port)
+    def on_shutdown():
+        MemoryProfiler.stop()
+
+    serve_asgi_app(app_reloader, http_addr='0.0.0.0', http_port=http_port, on_shutdown=on_shutdown)
 
 
 def _late_init(

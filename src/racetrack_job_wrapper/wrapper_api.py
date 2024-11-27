@@ -12,6 +12,7 @@ from contextvars import ContextVar
 from fastapi import Body, FastAPI, APIRouter, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 
+from racetrack_job_wrapper.profiler import MemoryProfiler
 from racetrack_job_wrapper.webview import setup_webview_endpoints
 from racetrack_job_wrapper.concurrency import AtomicInteger
 from racetrack_job_wrapper.docs import get_input_example, get_perform_docs
@@ -128,6 +129,8 @@ def _setup_api_endpoints(
     _setup_perform_endpoint(options)
     _setup_auxiliary_endpoints(options)
     _setup_static_endpoints(api, entrypoint)
+    if MemoryProfiler.is_enabled():
+        _setup_profiler_endpoints(api)
     setup_webview_endpoints(entrypoint, base_url, fastapi_app, api)
 
 
@@ -226,6 +229,39 @@ def _setup_static_endpoints(api: APIRouter, entrypoint: JobEntrypoint):
     for endpoint_path in sorted(static_endpoints.keys()):
         static_file = static_endpoints[endpoint_path]
         _setup_static_endpoint(api, entrypoint, endpoint_path, static_file)
+
+
+def _setup_profiler_endpoints(api: APIRouter):
+    """Configure Memory profile endpoints to turn it on and off"""
+    @api.post('/profiler/memray/start')
+    def _start_memray_profiler():
+        """Start memray profiler"""
+        MemoryProfiler.start()
+
+    @api.post('/profiler/memray/stop')
+    def _stop_memray_profiler():
+        """Stop memray profiler"""
+        MemoryProfiler.stop()
+
+    @api.get('/profiler/memray/report')
+    def _download_memray_report():
+        """Download memray report"""
+        report_data: bytes = MemoryProfiler.get_report_bytes()
+        headers = {'Content-Disposition': f'inline; filename="{MemoryProfiler.REPORT_FILENAME}"'}
+        return Response(report_data, headers=headers, media_type='application/octet-stream')
+
+    @api.get('/profiler/memray/flamegraph')
+    def _download_memray_flamegraph():
+        """Download memray report"""
+        file_data: bytes = MemoryProfiler.get_flamegraph_html()
+        headers = {'Content-Disposition': f'inline; filename="{MemoryProfiler.FLAMEGRAPH_FILENAME}"'}
+        return Response(file_data, headers=headers, media_type='text/html')
+
+    @api.get('/profiler/memray/stats')
+    def _get_memray_stats():
+        """Get memray report stats"""
+        data: str = MemoryProfiler.get_stats_output()
+        return Response(data, media_type='text/plain')
 
 
 def _setup_static_endpoint(

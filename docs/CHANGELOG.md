@@ -4,6 +4,12 @@ All **user-facing**, notable changes will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.17.0] - 2024-11-05
+### Added
+- Memory profiler (memray) can be enabled and managed at runtime by endpoints.
+  The reports can be downloaded without the need for the Kubernetes operator to be involved in this process
+  See [Memory profiler guide](./memory-profiler.md).
+
 ## [1.16.8] - 2024-10-23
 ### Added
 - This package is published to PyPI and can be installed with `pip install racetrack_job_runner`.
