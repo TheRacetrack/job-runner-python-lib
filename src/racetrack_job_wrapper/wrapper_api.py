@@ -173,6 +173,8 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
         @functools.wraps(func)
         def adder(*args, **kwargs):
             return func(*args, **kwargs) + 1
+        
+        return adder
 
     options.api.get("/simple/get/{param}")(plus_one(simple_get))
 
