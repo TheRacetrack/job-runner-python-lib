@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from inspect import getfullargspec
 from typing import Dict, List, Optional, Tuple, Iterable, Any, Callable, Mapping, Union
 
+from racetrack_job_wrapper.endpoint_config import EndpointConfig
+
 WsgiApplication = Callable[
     [
         Mapping[str, object],  # environ
@@ -139,6 +141,11 @@ def list_auxiliary_endpoints(entrypoint: JobEntrypoint) -> Dict[str, Callable]:
     if not hasattr(entrypoint, 'auxiliary_endpoints'):
         return {}
     return getattr(entrypoint, 'auxiliary_endpoints')()
+
+def list_auxiliary_endpoints_v2(entrypoint: JobEntrypoint) -> List[EndpointConfig]:
+    if not hasattr(entrypoint, 'auxiliary_endpoints_v2'):
+        return []
+    return getattr(entrypoint, 'auxiliary_endpoints_v2')()
 
 
 def list_static_endpoints(entrypoint: JobEntrypoint) -> Dict[str, Union[Tuple, str]]:

@@ -7,12 +7,13 @@ from dataclasses import dataclass
 
 import time
 from pathlib import Path
-from typing import Any, Callable, Dict, Tuple, Union, Optional
+from typing import Any, Callable, Dict, List, Tuple, Union, Optional
 from contextvars import ContextVar
 
 from fastapi import Body, FastAPI, APIRouter, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 
+from racetrack_job_wrapper.endpoint_config import EndpointConfig
 from racetrack_job_wrapper.profiler import MemoryProfiler
 from racetrack_job_wrapper.webview import setup_webview_endpoints
 from racetrack_job_wrapper.concurrency import AtomicInteger
@@ -21,6 +22,7 @@ from racetrack_job_wrapper.entrypoint import (
     JobEntrypoint,
     list_entrypoint_parameters,
     list_auxiliary_endpoints,
+    list_auxiliary_endpoints_v2,
     list_static_endpoints,
 )
 from racetrack_job_wrapper.health import setup_health_endpoints, HealthState
@@ -128,7 +130,12 @@ def _setup_api_endpoints(
     options: EndpointOptions,
 ):
     _setup_perform_endpoint(options)
-    _setup_auxiliary_endpoints(options)
+
+    if hasattr(entrypoint, 'auxiliary_endpoints'):
+        _setup_auxiliary_endpoints(options)
+    else:
+        _setup_auxiliary_endpoints_v2(options)
+
     _setup_static_endpoints(api, entrypoint)
     if MemoryProfiler.is_enabled():
         _setup_profiler_endpoints(api)
@@ -166,18 +173,6 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
     """Configure custom auxiliary endpoints defined by user in an entypoint"""
     auxiliary_endpoints = list_auxiliary_endpoints(options.entrypoint)
 
-    def simple_get(param, query):
-        return 8
-    
-    def plus_one(func):
-        @functools.wraps(func)
-        def adder(*args, **kwargs):
-            return func(*args, **kwargs) + 1
-        
-        return adder
-
-    options.api.get("/simple/get/{param}")(plus_one(simple_get))
-
     for endpoint_path in sorted(auxiliary_endpoints.keys()):
 
         endpoint_method: Callable = auxiliary_endpoints[endpoint_path]
@@ -206,6 +201,48 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
         _add_endpoint(endpoint_path, endpoint_method)
         logger.info(f'configured auxiliary endpoint: {endpoint_path}')
 
+def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
+    """Configure custom auxiliary endpoints defined by user in an entypoint"""
+    auxiliary_endpoints: List[EndpointConfig] = list_auxiliary_endpoints_v2(options.entrypoint)
+
+    def simple_get(param, query):
+        return 8
+    
+    def plus_one(func):
+        @functools.wraps(func)
+        def adder(*args, **kwargs):
+            return func(*args, **kwargs) + 1
+        
+        return adder
+
+    options.api.get("/simple/get/{param}")(plus_one(simple_get))
+
+    for endpoint_config in sorted(auxiliary_endpoints):
+        endpoint_path = endpoint_config.path
+        endpoint_name = endpoint_path.replace('/', '_')
+        example_input = get_input_example(options.entrypoint, endpoint=endpoint_path)
+        if not endpoint_path.startswith('/'):
+            endpoint_path = '/' + endpoint_path
+
+        # keep these variables inside closure as next loop cycle will overwrite it
+        def _add_endpoint(_endpoint_path: str, _endpoint_method: Callable):
+            summary = f"Call auxiliary endpoint: {_endpoint_path}"
+            description = "Call auxiliary endpoint"
+            endpoint_docs = inspect.getdoc(_endpoint_method)
+            if endpoint_docs:
+                description = f"Call auxiliary endpoint: {endpoint_docs}"
+
+            @options.api.post(
+                _endpoint_path,
+                operation_id=f'auxiliary_endpoint_{endpoint_name}',
+                summary=summary,
+                description=description,
+            )
+            def _auxiliary_endpoint(payload: Dict[str, Any] = Body(default=example_input)) -> Any:
+                return _call_job_endpoint(_endpoint_method, _endpoint_path, payload, options)
+
+        _add_endpoint(endpoint_path, endpoint_config.handler)
+        logger.info(f'configured auxiliary endpoint: {endpoint_path}')
 
 def _call_job_endpoint(
     endpoint_method: Callable,
@@ -217,8 +254,6 @@ def _call_job_endpoint(
     metric_endpoint_requests_started.labels(endpoint=endpoint_path).inc()
     start_time = time.time()
     try:
-        assert payload is not None, 'payload is empty'
-
         def _endpoint_caller() -> Any:
             return endpoint_method(**payload)
 
