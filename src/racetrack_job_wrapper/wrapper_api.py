@@ -168,7 +168,7 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
     def simple_get(param, query):
         return 8
 
-    options.api.get("/simple/get/{param}", simple_get)
+    options.api.get("/simple/get/{param}")(simple_get)
 
     for endpoint_path in sorted(auxiliary_endpoints.keys()):
 
