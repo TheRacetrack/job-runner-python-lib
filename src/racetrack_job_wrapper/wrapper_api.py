@@ -217,7 +217,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
 
     options.api.get("/simple/get/{param}")(plus_one(simple_get))
 
-    for endpoint_config in sorted(auxiliary_endpoints):
+    for endpoint_config in auxiliary_endpoints:
         endpoint_path = endpoint_config.path
         endpoint_name = endpoint_path.replace('/', '_')
         example_input = get_input_example(options.entrypoint, endpoint=endpoint_path)
