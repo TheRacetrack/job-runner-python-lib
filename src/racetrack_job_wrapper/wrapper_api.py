@@ -165,9 +165,10 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
     """Configure custom auxiliary endpoints defined by user in an entypoint"""
     auxiliary_endpoints = list_auxiliary_endpoints(options.entrypoint)
 
-    @options.api.get("simple/get/{param}")
     def simple_get(param, query):
-        return 7
+        return 8
+
+    options.api.get("/simple/get/{param}", simple_get)
 
     for endpoint_path in sorted(auxiliary_endpoints.keys()):
 
