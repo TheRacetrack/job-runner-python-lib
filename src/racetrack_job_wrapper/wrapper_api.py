@@ -1,3 +1,4 @@
+import functools
 import inspect
 import mimetypes
 import os
@@ -167,8 +168,13 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
 
     def simple_get(param, query):
         return 8
+    
+    def plus_one(func):
+        @functools.wraps(func)
+        def adder(*args, **kwargs):
+            return func(*args, **kwargs) + 1
 
-    options.api.get("/simple/get/{param}")(simple_get)
+    options.api.get("/simple/get/{param}")(plus_one(simple_get))
 
     for endpoint_path in sorted(auxiliary_endpoints.keys()):
 
