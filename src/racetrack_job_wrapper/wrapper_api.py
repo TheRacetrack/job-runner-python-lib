@@ -206,18 +206,6 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
     """Configure custom auxiliary endpoints defined by user in an entypoint"""
     auxiliary_endpoints: List[EndpointConfig] = list_auxiliary_endpoints_v2(options.entrypoint)
 
-    def simple_get(param, query: Annotated[float, Query(examples=[2.4])], bod: Annotated[float, Body(examples=[2.4])]):
-        return 8
-    
-    def plus_one(func):
-        @functools.wraps(func)
-        def adder(*args, **kwargs):
-            return func(*args, **kwargs) + 1
-        
-        return adder
-
-    options.api.get("/simple/get/{param}")(simple_get)
-
     for endpoint_config in auxiliary_endpoints:
         endpoint_path = endpoint_config.path
         endpoint_name = endpoint_path.replace('/', '_')
@@ -234,9 +222,29 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
 
             def forwarder(func):
                 @functools.wraps(func)
-                def adder(*args, **kwargs):
-                    return func(*args, **kwargs)
-                return adder
+                def forward(*args, **kwargs):
+                    metric_requests_started.inc()
+                    metric_endpoint_requests_started.labels(endpoint=endpoint_path).inc()
+                    start_time = time.time()
+                    try:
+                        def _endpoint_caller() -> Any:
+                            return func(*args, **kwargs)
+
+                        result = options.concurrency_runner(_endpoint_caller)
+                        return to_json_serializable(result)
+
+                    except TypeError as e:
+                        metric_request_internal_errors.labels(endpoint=endpoint_path).inc()
+                        raise ValueError(f'failed to call a function: {e}')
+                    except BaseException as e:
+                        metric_request_internal_errors.labels(endpoint=endpoint_path).inc()
+                        raise e
+                    finally:
+                        metric_request_duration.labels(endpoint=endpoint_path).observe(time.time() - start_time)
+                        metric_requests_done.inc()
+                        metric_last_call_timestamp.set(time.time())
+                
+                return forward
 
             match _endpoint_method:
                 case HTTPMethod.POST:
@@ -269,6 +277,8 @@ def _call_job_endpoint(
     metric_endpoint_requests_started.labels(endpoint=endpoint_path).inc()
     start_time = time.time()
     try:
+        assert payload is not None, 'payload is empty'
+
         def _endpoint_caller() -> Any:
             return endpoint_method(**payload)
 
