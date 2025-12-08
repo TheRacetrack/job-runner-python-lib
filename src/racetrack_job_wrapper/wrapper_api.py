@@ -8,10 +8,10 @@ from dataclasses import dataclass
 
 import time
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, Union, Optional
+from typing import Annotated, Any, Callable, Dict, List, Tuple, Union, Optional
 from contextvars import ContextVar
 
-from fastapi import Body, FastAPI, APIRouter, Request, Response, HTTPException
+from fastapi import Body, FastAPI, APIRouter, Query, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 
 from racetrack_job_wrapper.endpoint_config import EndpointConfig
@@ -206,7 +206,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
     """Configure custom auxiliary endpoints defined by user in an entypoint"""
     auxiliary_endpoints: List[EndpointConfig] = list_auxiliary_endpoints_v2(options.entrypoint)
 
-    def simple_get(param, query):
+    def simple_get(param, query: Annotated[float, Query(examples=[2.4])]):
         return 8
     
     def plus_one(func):
@@ -216,7 +216,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
         
         return adder
 
-    options.api.get("/simple/get/{param}")(plus_one(simple_get))
+    options.api.get("/simple/get/{param}")(simple_get)
 
     for endpoint_config in auxiliary_endpoints:
         endpoint_path = endpoint_config.path
