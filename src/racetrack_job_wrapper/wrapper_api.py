@@ -1,4 +1,5 @@
 import functools
+from http import HTTPMethod
 import inspect
 import mimetypes
 import os
@@ -220,28 +221,42 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
     for endpoint_config in auxiliary_endpoints:
         endpoint_path = endpoint_config.path
         endpoint_name = endpoint_path.replace('/', '_')
-        example_input = get_input_example(options.entrypoint, endpoint=endpoint_path)
         if not endpoint_path.startswith('/'):
             endpoint_path = '/' + endpoint_path
 
         # keep these variables inside closure as next loop cycle will overwrite it
-        def _add_endpoint(_endpoint_path: str, _endpoint_method: Callable):
+        def _add_endpoint(_endpoint_path: str, _endpoint_handler: Callable, _endpoint_method: HTTPMethod):
             summary = f"Call auxiliary endpoint: {_endpoint_path}"
             description = "Call auxiliary endpoint"
-            endpoint_docs = inspect.getdoc(_endpoint_method)
+            endpoint_docs = inspect.getdoc(_endpoint_handler)
             if endpoint_docs:
                 description = f"Call auxiliary endpoint: {endpoint_docs}"
 
-            @options.api.post(
-                _endpoint_path,
-                operation_id=f'auxiliary_endpoint_{endpoint_name}',
-                summary=summary,
-                description=description,
-            )
-            def _auxiliary_endpoint(payload: Dict[str, Any] = Body(default=example_input)) -> Any:
-                return _call_job_endpoint(_endpoint_method, _endpoint_path, payload, options)
+            def forwarder(func):
+                @functools.wraps(func)
+                def adder(*args, **kwargs):
+                    return func(*args, **kwargs)
+                return adder
 
-        _add_endpoint(endpoint_path, endpoint_config.handler)
+            match _endpoint_method:
+                case HTTPMethod.POST:
+                    options.api.post(
+                        _endpoint_path,
+                        operation_id=f'auxiliary_endpoint_{endpoint_name}',
+                        summary=summary,
+                        description=description,
+                    )(forwarder(_endpoint_handler))
+                case HTTPMethod.GET:
+                    options.api.get(
+                        _endpoint_path,
+                        operation_id=f'auxiliary_endpoint_{endpoint_name}',
+                        summary=summary,
+                        description=description,
+                    )(forwarder(_endpoint_handler))
+                case _:
+                    logger.error(f"method {_endpoint_method} chosen for path {_endpoint_path} is not supported")
+
+        _add_endpoint(endpoint_path, endpoint_config.handler, endpoint_config.method)
         logger.info(f'configured auxiliary endpoint: {endpoint_path}')
 
 def _call_job_endpoint(
