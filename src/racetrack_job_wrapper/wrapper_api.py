@@ -206,7 +206,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
     """Configure custom auxiliary endpoints defined by user in an entypoint"""
     auxiliary_endpoints: List[EndpointConfig] = list_auxiliary_endpoints_v2(options.entrypoint)
 
-    def simple_get(param, query: Annotated[float, Query(examples=[2.4])]):
+    def simple_get(param, query: Annotated[float, Query(examples=[2.4])], bod: Annotated[float, Body(examples=[2.4])]):
         return 8
     
     def plus_one(func):
