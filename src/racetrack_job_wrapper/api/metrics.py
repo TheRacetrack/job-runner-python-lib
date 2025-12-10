@@ -32,7 +32,7 @@ def setup_metrics_endpoint(api: FastAPI):
     api.mount('/metrics', WSGIMiddleware(metrics_app))
     TrailingSlashForwarder.mount_path('/metrics')
 
-    # @api.get('/metrics', tags=['root'])
-    # def _metrics_endpoint():
-    #     """List current Prometheus metrics"""
-    #     pass  # just register endpoint in swagger, it's handled by ASGI
+    @api.get('/metrics', tags=['root'])
+    def _metrics_endpoint():
+        """List current Prometheus metrics"""
+        pass  # just register endpoint in swagger, it's handled by ASGI

@@ -1,1 +1,1 @@
-git+https://github.com/TheRacetrack/job-runner-python-lib.git@master
+git+https://github.com/TheRacetrack/job-runner-python-lib.git@rest
