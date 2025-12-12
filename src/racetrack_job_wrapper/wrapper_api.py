@@ -213,7 +213,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
             endpoint_path = '/' + endpoint_path
 
         # keep these variables inside closure as next loop cycle will overwrite it
-        def _add_endpoint(_endpoint_path: str, _endpoint_handler: Callable, _endpoint_method: HTTPMethod):
+        def _add_endpoint(_endpoint_path: str, _endpoint_handler: Callable, _endpoint_method: HTTPMethod, _other_options: Dict[str, Any]):
             summary = f"Call auxiliary endpoint: {_endpoint_path}"
             description = "Call auxiliary endpoint"
             endpoint_docs = inspect.getdoc(_endpoint_handler)
@@ -253,6 +253,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
                         operation_id=f'auxiliary_endpoint_{endpoint_name}',
                         summary=summary,
                         description=description,
+                        **_other_options
                     )(forwarder(_endpoint_handler))
                 case HTTPMethod.GET:
                     options.api.get(
@@ -264,7 +265,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
                 case _:
                     logger.error(f"method {_endpoint_method} chosen for path {_endpoint_path} is not supported")
 
-        _add_endpoint(endpoint_path, endpoint_config.handler, endpoint_config.method)
+        _add_endpoint(endpoint_path, endpoint_config.handler, endpoint_config.method, endpoint_config.other_options)
         logger.info(f'configured auxiliary endpoint: {endpoint_path}')
 
 def _call_job_endpoint(
