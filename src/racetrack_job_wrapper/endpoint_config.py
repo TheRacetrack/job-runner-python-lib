@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from http import HTTPMethod
 from typing import Any, Callable, Dict
 
@@ -8,4 +8,4 @@ class EndpointConfig:
     path: str
     method: HTTPMethod
     handler: Callable
-    other_options: Dict[str, Any] = {}
+    other_options: Dict[str, Any] = field(default_factory=dict)
