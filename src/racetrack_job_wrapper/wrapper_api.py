@@ -253,7 +253,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
                         operation_id=f'auxiliary_endpoint_{endpoint_name}',
                         summary=summary,
                         description=description,
-                        **_other_options
+                        **_other_options,
                     )(forwarder(_endpoint_handler))
                 case HTTPMethod.GET:
                     options.api.get(
@@ -261,6 +261,7 @@ def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
                         operation_id=f'auxiliary_endpoint_{endpoint_name}',
                         summary=summary,
                         description=description,
+                        **_other_options,
                     )(forwarder(_endpoint_handler))
                 case _:
                     logger.error(f"method {_endpoint_method} chosen for path {_endpoint_path} is not supported")
