@@ -32,7 +32,7 @@ class Job:
         """
         Standard FastAPI methods of documenting and configuring parameters between body, query and path work for auxiliary endpoints.
         """
-        return body*query*path
+        return body * query * path
 
     def random(self, start: float, end: float) -> float:
         """Return random number within a range"""
