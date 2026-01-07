@@ -18,15 +18,19 @@ class Job:
         return x + y
 
     def auxiliary_endpoints_v2(self) -> List[EndpointConfig]:
-        """Dict of custom endpoint paths (besides "/perform") handled by Entrypoint methods"""
+        """
+        Dict of custom endpoint paths (besides "/perform") handled by Entrypoint methods.
+        EndpointConfig consists of a path to the endpoint, http method(POST or GET only),
+        handler function for the endpoint and optional parameters dict that is passed to FastAPI.
+        """
         return [
-            EndpointConfig('/multiply/{path}', HTTPMethod.POST, self.multiply),
-            EndpointConfig('/random', HTTPMethod.GET, self.random),
+            EndpointConfig('/multiply/{path}', HTTPMethod.POST, self.multiply, other_options=dict(tags=["items"])),
+            EndpointConfig('/random', HTTPMethod.GET, self.random, other_options=dict(tags=["items"])),
         ]
 
     def multiply(self, body: Annotated[float, Body(examples=[1.2])], query: Annotated[float, Query(example=2.4)], path: Annotated[float, Path(example=234.21)]) -> float:
         """
-        Standard fastapi methods of documenting and configuring parameters between body, query and path work for auxiliary endpoints.
+        Standard FastAPI methods of documenting and configuring parameters between body, query and path work for auxiliary endpoints.
         """
         return body*query*path
 
