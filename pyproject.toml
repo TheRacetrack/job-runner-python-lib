@@ -1,6 +1,6 @@
 [project]
 name = "racetrack_job_runner"
-version = "1.17.0"  # should be in sync with src/racetrack_job_wrapper/__init__.py
+version = "1.18.0"  # should be in sync with src/racetrack_job_wrapper/__init__.py
 description = "Racetrack Job Runner"
 license = {text = "Apache License 2.0"}
 authors = [

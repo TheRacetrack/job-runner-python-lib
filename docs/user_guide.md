@@ -146,6 +146,8 @@ def explain(self, x: float, y: float) -> dict[str, float]:
 ```
 
 If you need more control over those endpoints, you can define `auxiliary_endpoints_v2` method instead.
+At this moment this new syntax is incompatible with original `auxiliary_endpoints` - you can use only one
+or the other in the same job.
 `auxiliary_endpoints_v2` returns list of `EndpointConfig`s that allows choosing between defining endpoints
 as POST and GET as well as full control over where arguments are coming from(body, query, path) and can
 pass additional arguments to FastAPI to handle additional use cases such as tagging endpoints.
