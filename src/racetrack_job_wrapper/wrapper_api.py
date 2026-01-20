@@ -1,3 +1,5 @@
+import functools
+from http import HTTPMethod
 import inspect
 import mimetypes
 import os
@@ -6,12 +8,13 @@ from dataclasses import dataclass
 
 import time
 from pathlib import Path
-from typing import Any, Callable, Dict, Tuple, Union, Optional
+from typing import Annotated, Any, Callable, Dict, List, Tuple, Union, Optional
 from contextvars import ContextVar
 
-from fastapi import Body, FastAPI, APIRouter, Request, Response, HTTPException
+from fastapi import Body, FastAPI, APIRouter, Query, Request, Response, HTTPException
 from fastapi.responses import RedirectResponse
 
+from racetrack_job_wrapper.endpoint_config import EndpointConfig
 from racetrack_job_wrapper.profiler import MemoryProfiler
 from racetrack_job_wrapper.webview import setup_webview_endpoints
 from racetrack_job_wrapper.concurrency import AtomicInteger
@@ -20,6 +23,7 @@ from racetrack_job_wrapper.entrypoint import (
     JobEntrypoint,
     list_entrypoint_parameters,
     list_auxiliary_endpoints,
+    list_auxiliary_endpoints_v2,
     list_static_endpoints,
 )
 from racetrack_job_wrapper.health import setup_health_endpoints, HealthState
@@ -127,7 +131,12 @@ def _setup_api_endpoints(
     options: EndpointOptions,
 ):
     _setup_perform_endpoint(options)
-    _setup_auxiliary_endpoints(options)
+
+    if hasattr(entrypoint, 'auxiliary_endpoints'):
+        _setup_auxiliary_endpoints(options)
+    else:
+        _setup_auxiliary_endpoints_v2(options)
+
     _setup_static_endpoints(api, entrypoint)
     if MemoryProfiler.is_enabled():
         _setup_profiler_endpoints(api)
@@ -164,6 +173,7 @@ def _setup_perform_endpoint(options: EndpointOptions):
 def _setup_auxiliary_endpoints(options: EndpointOptions):
     """Configure custom auxiliary endpoints defined by user in an entypoint"""
     auxiliary_endpoints = list_auxiliary_endpoints(options.entrypoint)
+
     for endpoint_path in sorted(auxiliary_endpoints.keys()):
 
         endpoint_method: Callable = auxiliary_endpoints[endpoint_path]
@@ -192,6 +202,72 @@ def _setup_auxiliary_endpoints(options: EndpointOptions):
         _add_endpoint(endpoint_path, endpoint_method)
         logger.info(f'configured auxiliary endpoint: {endpoint_path}')
 
+def _setup_auxiliary_endpoints_v2(options: EndpointOptions):
+    """Configure custom auxiliary endpoints defined by user in an entypoint"""
+    auxiliary_endpoints: List[EndpointConfig] = list_auxiliary_endpoints_v2(options.entrypoint)
+
+    for endpoint_config in auxiliary_endpoints:
+        endpoint_path = endpoint_config.path
+        endpoint_name = endpoint_path.replace('/', '_')
+        if not endpoint_path.startswith('/'):
+            endpoint_path = '/' + endpoint_path
+
+        # keep these variables inside closure as next loop cycle will overwrite it
+        def _add_endpoint(_endpoint_path: str, _endpoint_handler: Callable, _endpoint_method: HTTPMethod, _other_options: Dict[str, Any]):
+            summary = f"Call auxiliary endpoint: {_endpoint_path}"
+            description = "Call auxiliary endpoint"
+            endpoint_docs = inspect.getdoc(_endpoint_handler)
+            if endpoint_docs:
+                description = f"Call auxiliary endpoint: {endpoint_docs}"
+
+            def forwarder(func):
+                @functools.wraps(func)
+                def forward(*args, **kwargs):
+                    metric_requests_started.inc()
+                    metric_endpoint_requests_started.labels(endpoint=endpoint_path).inc()
+                    start_time = time.time()
+                    try:
+                        def _endpoint_caller() -> Any:
+                            return func(*args, **kwargs)
+
+                        result = options.concurrency_runner(_endpoint_caller)
+                        return to_json_serializable(result)
+
+                    except TypeError as e:
+                        metric_request_internal_errors.labels(endpoint=endpoint_path).inc()
+                        raise ValueError(f'failed to call a function: {e}')
+                    except BaseException as e:
+                        metric_request_internal_errors.labels(endpoint=endpoint_path).inc()
+                        raise e
+                    finally:
+                        metric_request_duration.labels(endpoint=endpoint_path).observe(time.time() - start_time)
+                        metric_requests_done.inc()
+                        metric_last_call_timestamp.set(time.time())
+                
+                return forward
+
+            match _endpoint_method:
+                case HTTPMethod.POST:
+                    options.api.post(
+                        _endpoint_path,
+                        operation_id=f'auxiliary_endpoint_{endpoint_name}',
+                        summary=summary,
+                        description=description,
+                        **_other_options,
+                    )(forwarder(_endpoint_handler))
+                case HTTPMethod.GET:
+                    options.api.get(
+                        _endpoint_path,
+                        operation_id=f'auxiliary_endpoint_{endpoint_name}',
+                        summary=summary,
+                        description=description,
+                        **_other_options,
+                    )(forwarder(_endpoint_handler))
+                case _:
+                    logger.error(f"method {_endpoint_method} chosen for path {_endpoint_path} is not supported")
+
+        _add_endpoint(endpoint_path, endpoint_config.handler, endpoint_config.method, endpoint_config.other_options)
+        logger.info(f'configured auxiliary endpoint: {endpoint_path}')
 
 def _call_job_endpoint(
     endpoint_method: Callable,

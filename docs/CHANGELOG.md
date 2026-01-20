@@ -4,6 +4,12 @@ All **user-facing**, notable changes will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.18.0] - 2026-01-19
+### Added
+- `auxiliary_endpoints_v2` - new syntax for defining auxiliary endpoints with more options
+### Changed
+- now requires Python version 3.10 or higher
+
 ## [1.17.0] - 2024-11-05
 ### Added
 - Memory profiler (memray) can be enabled and managed at runtime by endpoints.
